@@ -1,0 +1,406 @@
+:root {
+  --bg: #0b0b12;
+  --bg-alt: #14141f;
+  --card-bg: #1b1b29;
+  --border: #2c2c3d;
+  --text: #f2f2f7;
+  --text-dim: #9a9ab0;
+  --accent: #ff2e93;
+  --accent-2: #35e0ff;
+  --success: #4ade80;
+  --danger: #ff5c7a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  background: radial-gradient(circle at top, var(--bg-alt), var(--bg));
+  color: var(--text);
+  font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", -apple-system,
+    BlinkMacSystemFont, sans-serif;
+  min-height: 100vh;
+}
+
+button {
+  font-family: inherit;
+}
+
+.page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+  min-height: 100vh;
+}
+
+.admin-page {
+  max-width: 900px;
+}
+
+.brand {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.brand h1 {
+  font-size: 2.4rem;
+  margin: 0;
+  letter-spacing: 0.05em;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.brand .subtitle {
+  color: var(--text-dim);
+  margin: 4px 0 0;
+  font-size: 0.95rem;
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  margin-bottom: 20px;
+}
+
+.card h1,
+.card h2 {
+  margin-top: 0;
+}
+
+.name-card,
+.login-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 420px;
+  margin: 40px auto 0;
+}
+
+.login-card h1 {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+label {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+}
+
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 1rem;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+  outline: 2px solid var(--accent-2);
+  border-color: var(--accent-2);
+}
+
+.primary-btn {
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  color: #0b0b12;
+  border: none;
+  border-radius: 10px;
+  padding: 13px 16px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 6px;
+  transition: transform 0.1s ease, opacity 0.1s ease;
+}
+
+.primary-btn:hover {
+  transform: translateY(-1px);
+}
+
+.primary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--accent-2);
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 4px;
+  text-decoration: underline;
+}
+
+.danger-btn {
+  background: none;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.danger-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.error-text {
+  color: var(--danger);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.message {
+  text-align: center;
+  font-weight: 600;
+  margin: 12px 0 0;
+}
+
+.message.success {
+  color: var(--success);
+}
+
+.loading-text,
+.empty-text {
+  color: var(--text-dim);
+  text-align: center;
+  padding: 16px 0;
+}
+
+.calendar-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.employee-name {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin: 12px 0 18px;
+}
+
+.month-nav button {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.month-label {
+  font-size: 1.2rem;
+  font-weight: 700;
+  min-width: 140px;
+  text-align: center;
+}
+
+.hint {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  text-align: center;
+  margin: 0 0 14px;
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+
+.weekday.sun {
+  color: var(--danger);
+}
+
+.weekday.sat {
+  color: var(--accent-2);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.day-cell {
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s ease, transform 0.08s ease;
+}
+
+.day-cell:hover:not(:disabled) {
+  border-color: var(--accent-2);
+}
+
+.day-cell.selected {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #0b0b12;
+  font-weight: 700;
+  border-color: transparent;
+  transform: scale(1.03);
+}
+
+.day-cell.other-month {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.day-cell:disabled {
+  cursor: default;
+}
+
+.save-btn {
+  width: 100%;
+  margin-top: 18px;
+}
+
+/* 관리자 화면 */
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.admin-header h1 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.avail-table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 0.9rem;
+}
+
+.avail-table th,
+.avail-table td {
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.avail-table thead th {
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+}
+
+.avail-table .date-col {
+  text-align: left;
+  white-space: nowrap;
+  position: sticky;
+  left: 0;
+  background: var(--card-bg);
+  z-index: 1;
+}
+
+.avail-table thead th.date-col {
+  z-index: 2;
+}
+
+.avail-table .sun-row .date-col {
+  color: var(--danger);
+}
+
+.avail-table .sat-row .date-col {
+  color: var(--accent-2);
+}
+
+.mark-ok {
+  color: var(--success);
+  font-weight: 700;
+}
+
+.employee-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.employee-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+
+.add-employee-form {
+  display: flex;
+  gap: 8px;
+}
+
+.add-employee-form input {
+  flex: 1;
+}
+
+.add-employee-form .primary-btn {
+  margin-top: 0;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .brand h1 {
+    font-size: 2rem;
+  }
+
+  .day-cell {
+    font-size: 0.85rem;
+  }
+
+  .admin-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+}
