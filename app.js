@@ -1,5 +1,7 @@
 (() => {
   const STORAGE_KEY = "neon-calendar-data";
+  const MAX_ITEMS_IN_CELL = 2;
+  const YEAR_RANGE = 10;
 
   const state = {
     viewYear: null,
@@ -13,34 +15,35 @@
   state.viewMonth = todayObj.getMonth();
 
   const calendarGrid = document.getElementById("calendarGrid");
-  const monthLabel = document.getElementById("monthLabel");
+  const yearSelect = document.getElementById("yearSelect");
+  const monthSelect = document.getElementById("monthSelect");
   const selectedDateLabel = document.getElementById("selectedDateLabel");
-  const memoInput = document.getElementById("memoInput");
   const todoForm = document.getElementById("todoForm");
   const todoInput = document.getElementById("todoInput");
   const todoAddBtn = document.getElementById("todoAddBtn");
   const todoList = document.getElementById("todoList");
   const todoEmpty = document.getElementById("todoEmpty");
 
-  document.getElementById("prevMonth").addEventListener("click", () => {
-    changeMonth(-1);
-  });
-  document.getElementById("nextMonth").addEventListener("click", () => {
-    changeMonth(1);
-  });
+  populateSelectors();
+
+  document.getElementById("prevMonth").addEventListener("click", () => changeMonth(-1));
+  document.getElementById("nextMonth").addEventListener("click", () => changeMonth(1));
   document.getElementById("todayBtn").addEventListener("click", () => {
     const now = new Date();
     state.viewYear = now.getFullYear();
     state.viewMonth = now.getMonth();
+    syncSelectors();
     selectDate(formatDate(now));
     renderCalendar();
   });
 
-  memoInput.addEventListener("input", () => {
-    if (!state.selectedDate) return;
-    const entry = getEntry(state.selectedDate);
-    entry.memo = memoInput.value;
-    saveData();
+  yearSelect.addEventListener("change", () => {
+    state.viewYear = Number(yearSelect.value);
+    renderCalendar();
+  });
+
+  monthSelect.addEventListener("change", () => {
+    state.viewMonth = Number(monthSelect.value);
     renderCalendar();
   });
 
@@ -50,20 +53,61 @@
     const text = todoInput.value.trim();
     if (!text) return;
     const entry = getEntry(state.selectedDate);
-    entry.todos.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), text, done: false });
+    entry.items.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), text, done: false });
     todoInput.value = "";
     saveData();
     renderTodos();
     renderCalendar();
   });
 
+  function populateSelectors() {
+    const currentYear = new Date().getFullYear();
+    yearSelect.innerHTML = "";
+    for (let y = currentYear - YEAR_RANGE; y <= currentYear + YEAR_RANGE; y++) {
+      const opt = document.createElement("option");
+      opt.value = y;
+      opt.textContent = y;
+      yearSelect.appendChild(opt);
+    }
+    monthSelect.innerHTML = "";
+    for (let m = 0; m < 12; m++) {
+      const opt = document.createElement("option");
+      opt.value = m;
+      opt.textContent = m + 1;
+      monthSelect.appendChild(opt);
+    }
+    syncSelectors();
+  }
+
+  function syncSelectors() {
+    yearSelect.value = state.viewYear;
+    monthSelect.value = state.viewMonth;
+  }
+
   function loadData() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : {};
+      const parsed = raw ? JSON.parse(raw) : {};
+      return migrateData(parsed);
     } catch (e) {
       return {};
     }
+  }
+
+  function migrateData(parsed) {
+    const migrated = {};
+    Object.keys(parsed).forEach((dateKey) => {
+      const entry = parsed[dateKey];
+      const items = Array.isArray(entry.items) ? entry.items.slice() : [];
+      if (Array.isArray(entry.todos)) {
+        entry.todos.forEach((t) => items.push(t));
+      }
+      if (typeof entry.memo === "string" && entry.memo.trim()) {
+        items.unshift({ id: "memo-" + dateKey, text: entry.memo.trim(), done: false });
+      }
+      migrated[dateKey] = { items };
+    });
+    return migrated;
   }
 
   function saveData() {
@@ -76,7 +120,7 @@
 
   function getEntry(dateKey) {
     if (!state.data[dateKey]) {
-      state.data[dateKey] = { memo: "", todos: [] };
+      state.data[dateKey] = { items: [] };
     }
     return state.data[dateKey];
   }
@@ -97,11 +141,11 @@
       state.viewMonth = 0;
       state.viewYear += 1;
     }
+    syncSelectors();
     renderCalendar();
   }
 
   function renderCalendar() {
-    monthLabel.textContent = `${state.viewYear}년 ${state.viewMonth + 1}월`;
     calendarGrid.innerHTML = "";
 
     const firstOfMonth = new Date(state.viewYear, state.viewMonth, 1);
@@ -141,31 +185,31 @@
       numEl.textContent = cellDate.getDate();
       cell.appendChild(numEl);
 
+      const itemsWrap = document.createElement("div");
+      itemsWrap.className = "cell-items";
       const entry = state.data[dateKey];
-      const meta = document.createElement("div");
-      meta.className = "day-meta";
-      if (entry) {
-        if (entry.memo && entry.memo.trim()) {
-          const flag = document.createElement("span");
-          flag.className = "memo-flag";
-          flag.textContent = "✎";
-          meta.appendChild(flag);
-        }
-        if (entry.todos && entry.todos.length) {
-          const doneCount = entry.todos.filter((t) => t.done).length;
-          const count = document.createElement("span");
-          count.className = "todo-count";
-          count.textContent = `${doneCount}/${entry.todos.length}`;
-          meta.appendChild(count);
+      if (entry && entry.items && entry.items.length) {
+        entry.items.slice(0, MAX_ITEMS_IN_CELL).forEach((item) => {
+          const el = document.createElement("div");
+          el.className = "cell-item" + (item.done ? " done" : "");
+          el.textContent = item.text;
+          itemsWrap.appendChild(el);
+        });
+        if (entry.items.length > MAX_ITEMS_IN_CELL) {
+          const more = document.createElement("div");
+          more.className = "cell-more";
+          more.textContent = `+${entry.items.length - MAX_ITEMS_IN_CELL}`;
+          itemsWrap.appendChild(more);
         }
       }
-      cell.appendChild(meta);
+      cell.appendChild(itemsWrap);
 
       cell.addEventListener("click", () => {
         selectDate(dateKey);
         if (otherMonth) {
           state.viewYear = cellDate.getFullYear();
           state.viewMonth = cellDate.getMonth();
+          syncSelectors();
           renderCalendar();
         }
       });
@@ -181,12 +225,8 @@
     const weekdayNames = ["일", "월", "화", "수", "목", "금", "토"];
     selectedDateLabel.textContent = `${y}년 ${m}월 ${d}일 (${weekdayNames[dateObj.getDay()]})`;
 
-    memoInput.disabled = false;
     todoInput.disabled = false;
     todoAddBtn.disabled = false;
-
-    const entry = getEntry(dateKey);
-    memoInput.value = entry.memo || "";
 
     renderTodos();
     renderCalendar();
@@ -200,23 +240,23 @@
       return;
     }
     const entry = getEntry(state.selectedDate);
-    if (!entry.todos.length) {
+    if (!entry.items.length) {
       todoEmpty.style.display = "block";
-      todoEmpty.textContent = "할 일이 없습니다.";
+      todoEmpty.textContent = "내용이 없습니다.";
       return;
     }
     todoEmpty.style.display = "none";
 
-    entry.todos.forEach((todo) => {
+    entry.items.forEach((item) => {
       const li = document.createElement("li");
-      li.className = "todo-item" + (todo.done ? " done" : "");
+      li.className = "todo-item" + (item.done ? " done" : "");
 
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
       checkbox.className = "todo-check";
-      checkbox.checked = todo.done;
+      checkbox.checked = item.done;
       checkbox.addEventListener("change", () => {
-        todo.done = checkbox.checked;
+        item.done = checkbox.checked;
         saveData();
         renderTodos();
         renderCalendar();
@@ -224,14 +264,14 @@
 
       const text = document.createElement("span");
       text.className = "todo-text";
-      text.textContent = todo.text;
+      text.textContent = item.text;
 
       const deleteBtn = document.createElement("button");
       deleteBtn.type = "button";
       deleteBtn.className = "todo-delete";
       deleteBtn.textContent = "✕";
       deleteBtn.addEventListener("click", () => {
-        entry.todos = entry.todos.filter((t) => t.id !== todo.id);
+        entry.items = entry.items.filter((t) => t.id !== item.id);
         saveData();
         renderTodos();
         renderCalendar();
