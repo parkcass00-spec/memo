@@ -169,7 +169,10 @@ body {
 }
 
 .day-cell.other-month {
-  opacity: 0.3;
+  background: transparent;
+  border-color: transparent;
+  cursor: default;
+  pointer-events: none;
 }
 
 .day-cell.today {
@@ -184,7 +187,8 @@ body {
 }
 
 .day-number {
-  font-size: 0.78rem;
+  font-size: 1rem;
+  font-weight: 600;
   color: var(--text);
   flex: 0 0 auto;
 }
@@ -199,15 +203,27 @@ body {
 .cell-items {
   display: flex;
   flex-direction: column;
-  gap: 1px;
-  overflow: hidden;
+  gap: 2px;
+  overflow-y: auto;
+  overflow-x: hidden;
   flex: 1 1 auto;
   min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--neon-dim) transparent;
+}
+
+.cell-items::-webkit-scrollbar {
+  width: 4px;
+}
+
+.cell-items::-webkit-scrollbar-thumb {
+  background: var(--neon-dim);
+  border-radius: 2px;
 }
 
 .cell-item {
-  font-size: 0.68rem;
-  line-height: 1.25;
+  font-size: 0.85rem;
+  line-height: 1.3;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -215,18 +231,13 @@ body {
   padding: 0 3px;
   border-radius: 3px;
   background: rgba(57, 255, 20, 0.08);
+  flex: 0 0 auto;
 }
 
 .cell-item.done {
   color: var(--text-dim);
   text-decoration: line-through;
   background: transparent;
-}
-
-.cell-more {
-  font-size: 0.65rem;
-  color: var(--text-dim);
-  padding-left: 3px;
 }
 
 .agenda-panel {
@@ -361,10 +372,10 @@ body {
 
 @media (max-width: 700px), (max-height: 620px) {
   .day-number {
-    font-size: 0.68rem;
+    font-size: 0.85rem;
   }
   .cell-item {
-    font-size: 0.6rem;
+    font-size: 0.72rem;
   }
   .date-selectors,
   .date-select {

@@ -1,6 +1,5 @@
 (() => {
   const STORAGE_KEY = "neon-calendar-data";
-  const MAX_ITEMS_IN_CELL = 2;
   const YEAR_RANGE = 10;
 
   const state = {
@@ -180,39 +179,29 @@
       if (dateKey === todayKey) cell.classList.add("today");
       if (dateKey === state.selectedDate) cell.classList.add("selected");
 
-      const numEl = document.createElement("div");
-      numEl.className = "day-number";
-      numEl.textContent = cellDate.getDate();
-      cell.appendChild(numEl);
+      if (!otherMonth) {
+        const numEl = document.createElement("div");
+        numEl.className = "day-number";
+        numEl.textContent = cellDate.getDate();
+        cell.appendChild(numEl);
 
-      const itemsWrap = document.createElement("div");
-      itemsWrap.className = "cell-items";
-      const entry = state.data[dateKey];
-      if (entry && entry.items && entry.items.length) {
-        entry.items.slice(0, MAX_ITEMS_IN_CELL).forEach((item) => {
-          const el = document.createElement("div");
-          el.className = "cell-item" + (item.done ? " done" : "");
-          el.textContent = item.text;
-          itemsWrap.appendChild(el);
+        const itemsWrap = document.createElement("div");
+        itemsWrap.className = "cell-items";
+        const entry = state.data[dateKey];
+        if (entry && entry.items && entry.items.length) {
+          entry.items.forEach((item) => {
+            const el = document.createElement("div");
+            el.className = "cell-item" + (item.done ? " done" : "");
+            el.textContent = item.text;
+            itemsWrap.appendChild(el);
+          });
+        }
+        cell.appendChild(itemsWrap);
+
+        cell.addEventListener("click", () => {
+          selectDate(dateKey);
         });
-        if (entry.items.length > MAX_ITEMS_IN_CELL) {
-          const more = document.createElement("div");
-          more.className = "cell-more";
-          more.textContent = `+${entry.items.length - MAX_ITEMS_IN_CELL}`;
-          itemsWrap.appendChild(more);
-        }
       }
-      cell.appendChild(itemsWrap);
-
-      cell.addEventListener("click", () => {
-        selectDate(dateKey);
-        if (otherMonth) {
-          state.viewYear = cellDate.getFullYear();
-          state.viewMonth = cellDate.getMonth();
-          syncSelectors();
-          renderCalendar();
-        }
-      });
 
       calendarGrid.appendChild(cell);
     }
